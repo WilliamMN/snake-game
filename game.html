@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .bloco {
+      height: 10px;
+      width: 10px;
+      background-color: red;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    body {
+      margin: 0;
+    }
+
+    .tela {
+      width: 250px;
+      height: 250px;
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="tela" id="tela">
+    <div class="bloco" id="bloco"></div>
+  </div>
+  <span id="posicaoY"></span>
+  <br>
+  <span id="posicaoX"></span>
+  <br>
+  <span id="pontuacao"></span>
+</body>
+
+</html>
+
+<script>
+
+
+  document.getElementById("tela").addEventListener("click", (event) => {
+    var tela = document.getElementById("tela")
+
+    tela.innerHTML += `<div class='ponto' style='width: 10px; height: 10px; background-color: green; position: absolute; top: ${event.clientY}px; left: ${event.clientX}px'>`
+  })
+
+  var velocidade = "6"
+  var pixels = 1
+  var interval
+  var telaW = document.getElementById("tela").clientWidth
+  var telaH = document.getElementById("tela").clientHeight
+
+  addEventListener("keydown", (event) => {
+    var bloco = document.getElementById("bloco")
+    switch (event.keyCode) {
+      case 38:
+        stop(interval)
+        interval = goTop(bloco)
+        break;
+
+      case 40:
+        stop(interval)
+        interval = goBottom(bloco)
+        break;
+
+      case 37:
+        stop(interval)
+        interval = goLeft(bloco)
+        break;
+
+      case 39:
+        stop(interval)
+        interval = goRight(bloco)
+        break;
+
+      case 32:
+        console.log("Atirar");
+        break;
+
+      default:
+        stop(interval)
+        break;
+    }
+  })
+
+  function colisao(bloco) {
+    var pontos = document.getElementsByClassName("ponto")
+    var pontuacao = document.getElementById("pontuacao")
+
+    for (const point of pontos) {
+
+      if (bloco.offsetLeft >= point.offsetLeft && bloco.offsetLeft <= (point.offsetLeft + 10)) {
+        if (bloco.offsetTop >= point.offsetTop && bloco.offsetTop <= (point.offsetTop + 10)) {
+          point.remove()
+          pontuacao.innerHTML = Number(pontuacao.innerHTML) + 1
+        }
+      }
+
+      if ((bloco.offsetLeft + 10) >= point.offsetLeft && (bloco.offsetLeft + 10) <= (point.offsetLeft + 10)) {
+        if ((bloco.offsetTop + 10) >= point.offsetTop && (bloco.offsetTop + 10) <= (point.offsetTop + 10)) {
+          point.remove()
+          pontuacao.innerHTML = Number(pontuacao.innerHTML) + 1
+        }
+      }
+    }
+  }
+
+
+  function goRight(bloco) {
+    return setInterval(() => {
+      var right = Number(bloco.style.left.split("px")[0])
+      var blocoW = bloco.clientWidth
+      colisao(bloco)
+      if (telaW - (right + blocoW) >= 1) {
+        bloco.style.left = (right + pixels) + "px"
+      } else {
+        stop(interval)
+      }
+      atualizarTexto(bloco)
+    }, velocidade)
+  }
+
+  function goLeft(bloco) {
+    return setInterval(() => {
+      var left = Number(bloco.style.left.split("px")[0])
+      colisao(bloco)
+      if (telaW - (left) != telaW) {
+        bloco.style.left = (left - pixels) + "px"
+      } else {
+        stop(interval)
+      }
+      atualizarTexto(bloco)
+    }, velocidade)
+  }
+
+  function goTop(bloco) {
+    return setInterval(() => {
+      var top = Number(bloco.style.top.split("px")[0])
+      colisao(bloco)
+      if (telaH - (top) != telaH) {
+        bloco.style.top = (top - pixels) + "px"
+      } else {
+        stop(interval)
+      }
+
+      atualizarTexto(bloco)
+    }, velocidade)
+  }
+
+  function goBottom(bloco) {
+    return setInterval(() => {
+      var bottom = Number(bloco.style.top.split("px")[0])
+      var blocoH = bloco.clientHeight
+      colisao(bloco)
+      if (telaH - (bottom + blocoH) >= 1) {
+        bloco.style.top = (bottom + pixels) + "px"
+      } else {
+        stop(interval)
+      }
+      atualizarTexto(bloco)
+    }, velocidade)
+  }
+
+  function stop(interval) {
+    clearInterval(interval)
+    interval = null;
+  }
+
+  function atualizarTexto(bloco) {
+    document.getElementById("posicaoY").innerHTML = "y = " + Number(bloco.style.top.split("px")[0])
+    document.getElementById("posicaoX").innerHTML = "x = " + Number(bloco.style.left.split("px")[0])
+  }
+</script>
